@@ -9,7 +9,9 @@ app.use(express.json());
 app.use(cors());
 app.use(router);
 
-const { PORT } = process.env;
+const PORT: number = Number(process.env.PORT);
+
+console.log(typeof PORT)
 
 app.listen(PORT, () => {
   console.log(`server running on PORT ${PORT}`);

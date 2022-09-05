@@ -9,7 +9,7 @@ import { viewCardSchema } from "../schemas/viewCardSchema";
 const cardRouter = Router();
 
 cardRouter.post(
-  "/card",
+  "/card/create",
   schemaValidateMiddleware(createCardSchema),
   cardController.createCard
 );
@@ -19,18 +19,18 @@ cardRouter.post(
   cardController.activateCard
 );
 cardRouter.get(
-  "/card",
+  "/card/view",
   schemaValidateMiddleware(viewCardSchema),
   cardController.viewCards
 );
-cardRouter.get("/balance/:cardId", cardController.getBalanceCard);
+cardRouter.get("/card/balance/:cardId", cardController.getBalanceCard);
 cardRouter.put(
-  "/card/:id/blocked",
+  "/card/:id/block",
   schemaValidateMiddleware(blockedSchema),
   cardController.blockedCard
 );
 cardRouter.put(
-  "/card/:id/unblocked",
+  "/card/:id/unblock",
   schemaValidateMiddleware(blockedSchema),
   cardController.unblockedCard
 );

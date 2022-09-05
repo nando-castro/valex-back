@@ -23,12 +23,11 @@ export async function blockedCard(id: number, password: string) {
     throw { type: "not_found", message: "no data in the database" };
   }
   //Não está descriptografando a senha
-  /* const decryptPassword = cryptr.decrypt(card.password);
-  console.log(decryptPassword);
+  const decryptPassword = cryptr.decrypt(`${card.password}`);
 
   if (decryptPassword !== password) {
     throw { type: "unauthorized", message: "incorrect card password" };
-  } */
+  }
 
   await cardRepository.update(id, { isBlocked: true });
 }
@@ -45,13 +44,13 @@ export async function unblockedCard(id: number, password: string) {
   if (!card.isBlocked) {
     throw { type: "not_found", message: "no data in the database" };
   }
+  
   //Não está descriptografando a senha
-  /* const decryptPassword = cryptr.decrypt(card.password);
-  console.log(decryptPassword);
+  const decryptPassword = cryptr.decrypt(`${card.password}`);
 
   if (decryptPassword !== password) {
     throw { type: "unauthorized", message: "incorrect card password" };
-  } */
+  }
 
   await cardRepository.update(id, { isBlocked: false });
 }
@@ -111,7 +110,6 @@ export async function createCard(
     cardholderName,
     securityCode: encryptedCVV,
     expirationDate,
-    password: undefined,
     isVirtual: false,
     originalCardId: undefined,
     isBlocked: true,

@@ -13,3 +13,18 @@ export async function createCard(req: Request, res: Response) {
   const newCard = await cardService.createCard(apiKey, employeeId, cardType);
   res.status(200).send(newCard);
 }
+/* 
+{
+  "card": {
+    "employeeId": 1,
+    "number": "4853798628416",
+    "cardholderName": "FULANO F F SILVA",
+    "securityCode": "238",
+    "expirationDate": "09/27",
+    "isVirtual": false,
+    "isBlocked": true,
+    "type": "education"
+  },
+  "securityCode": "238"
+}
+ */

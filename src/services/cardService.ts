@@ -5,8 +5,6 @@ import * as employeeRepository from "../repositories/employeeRepository";
 import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import Cryptr from "cryptr";
-//const cryptr = new Cryptr(process.env.SECRET_KEY);
-const cryptr = new Cryptr('SecretKey');
 
 //import unauthorizedError from "../utils/error";
 
@@ -15,30 +13,38 @@ export async function createCard(
   employeeId: number,
   cardType: TransactionTypes
 ) {
+  //const cryptr = new Cryptr(process.env.SECRET_KEY);
+  const cryptr = new Cryptr("SecretKey");
   const company = await validateApiKey(apiKey);
   const employee = await validateEmployee(employeeId);
   //const cardExists = await validateCardType(cardType, employeeId);
 
   const numberCard = faker.finance.creditCardNumber("visa");
 
-  const namePrintedCard = formatNameCard(employee.fullName);
+  const cardholderName = formatNameCard(employee.fullName);
 
-  const dateExpire = dayjs().add(5, "year").format("MM/YY");
+  const expirationDate = dayjs().add(5, "year").format("MM/YY");
 
-  const codeSecurity = faker.finance.creditCardCVV();
+  const securityCode = faker.finance.creditCardCVV();
 
-  const encryptedCVV = cryptr.encrypt(codeSecurity);
+  const encryptedCVV = cryptr.encrypt(securityCode);
 
   const card = {
     employeeId,
-    numberCard,
-    namePrintedCard,
-    codeSecurity,
-    dateExpire,
-    cardType,
+    number: numberCard,
+    cardholderName,
+    securityCode,
+    expirationDate,
+    password: undefined,
+    isVirtual: false,
+    originalCardId: undefined,
+    isBlocked: true,
+    type: cardType,
   };
 
-  return { card, codeSecurity };
+  await cardRepository.insert(card);
+
+  return { card, securityCode };
 }
 
 async function validateCardType(

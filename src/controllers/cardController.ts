@@ -14,13 +14,22 @@ export async function createCard(req: Request, res: Response) {
   res.status(201).send(newCard);
 }
 
-export async function activateCard (req: Request, res: Response) {
-  const {id} = req.params;
-  const {cvc, password} = req.body;
+export async function activateCard(req: Request, res: Response) {
+  const { id } = req.params;
+  const { cvc, password } = req.body;
 
   await cardService.activationCard(Number(id), cvc, password);
 
-  return res.sendStatus(200)
+  return res.sendStatus(200);
+}
+
+export async function blockedCard(req: Request, res: Response) {
+  const { id } = req.params;
+  const { password } = req.body;
+
+  await cardService.blockedCard(Number(id), password);
+
+  return res.sendStatus(200);
 }
 
 /* 

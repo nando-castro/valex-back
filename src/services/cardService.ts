@@ -10,6 +10,59 @@ const cryptr = new Cryptr("SecretKey");
 
 //import unauthorizedError from "../utils/error";
 
+export async function blockedCard(id: number, password: string) {
+  const card = await cardRepository.findById(id);
+  if (!card) {
+    throw { type: "not_found", message: "no data in the database" };
+  }
+  const dateToday = dayjs().format("MM/YY");
+  if (dayjs(dateToday).isAfter(dayjs(card.expirationDate))) {
+    throw { type: "bad_request", message: "expired card" };
+  }
+  if (card.isBlocked) {
+    throw { type: "not_found", message: "no data in the database" };
+  }
+  //Não está descriptografando a senha
+  /* const decryptPassword = cryptr.decrypt(card.password);
+  console.log(decryptPassword);
+
+  if (decryptPassword !== password) {
+    throw { type: "unauthorized", message: "incorrect card password" };
+  } */
+
+  await cardRepository.update(id, { isBlocked: true });
+}
+
+export async function activationCard(
+  id: number,
+  cvc: string,
+  password: string
+) {
+  const card = await cardRepository.findById(id);
+  if (!card) {
+    throw { type: "not_found", message: "no data in the database" };
+  }
+  const dateToday = dayjs().format("MM/YY");
+  if (dayjs(dateToday).isAfter(dayjs(card.expirationDate))) {
+    throw { type: "bad_request", message: "expired card" };
+  }
+  if (card.password) {
+    throw { type: "conflict", message: "card already has password" };
+  }
+  const checkCVC = cryptr.decrypt(card.securityCode);
+  if (checkCVC !== cvc) {
+    throw { type: "unauthorized", message: "unauthorized" };
+  }
+  if (!Number(password) || password.length != 4) {
+    throw { type: "bad_request", message: "password in wrong format" };
+  }
+  const encryptPassword = cryptr.encrypt(password);
+  await cardRepository.update(id, {
+    password: encryptPassword,
+    isBlocked: false,
+  });
+}
+
 export async function createCard(
   apiKey: string,
   employeeId: number,
@@ -43,39 +96,9 @@ export async function createCard(
   };
 
   await cardRepository.insert(card);
-  console.log(securityCode)
+  console.log(securityCode);
 
   return { card, securityCode };
-}
-
-export async function activationCard(
-  id: number,
-  cvc: string,
-  password: string
-) {
-  const card = await cardRepository.findById(id);
-  if (!card) {
-    throw { type: "not_found", message: "no data in the database" };
-  }
-  const dateToday = dayjs().format("MM/YY");
-  if (dayjs(dateToday).isAfter(dayjs(card.expirationDate))) {
-    throw { type: "bad_request", message: "expired card" };
-  }
-  if (card.password) {
-    throw { type: "conflict", message: "card already has password" };
-  }
-  const checkCVC = cryptr.decrypt(card.securityCode);
-  if (checkCVC !== cvc) {
-    throw { type: "unauthorized", message: "unauthorized" };
-  }
-  if (!Number(password) || password.length != 4) {
-    throw { type: "bad_request", message: "password in wrong format" };
-  }
-  const encryptPassword = cryptr.encrypt(password);
-  await cardRepository.update(
-    id,
-    { password: encryptPassword, isBlocked: false }
-  );
 }
 
 async function validateCardType(

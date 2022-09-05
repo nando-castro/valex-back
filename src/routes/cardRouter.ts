@@ -1,3 +1,4 @@
+import { blockedSchema } from './../schemas/blockedSchema';
 import { activationSchema } from "./../schemas/activationSchema";
 import { createCardSchema } from "./../schemas/cardSchema";
 import { Router } from "express";
@@ -16,5 +17,6 @@ cardRouter.post(
   schemaValidateMiddleware(activationSchema),
   cardController.activateCard
 );
+cardRouter.put("/card/:id/blocked", schemaValidateMiddleware(blockedSchema), cardController.blockedCard)
 
 export { cardRouter };

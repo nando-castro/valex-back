@@ -6,6 +6,7 @@ import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import Cryptr from "cryptr";
 const cryptr = new Cryptr("SecretKey");
+//const cryptr = new Cryptr(process.env.SECRET_KEY);
 
 //import unauthorizedError from "../utils/error";
 
@@ -14,20 +15,9 @@ export async function createCard(
   employeeId: number,
   cardType: TransactionTypes
 ) {
-  //const cryptr = new Cryptr(process.env.SECRET_KEY);
   const company = await validateApiKey(apiKey);
   const employee = await validateEmployee(employeeId);
   const cardExists = await validateCardType(cardType, employeeId);
-
-  /* if (!company || !employee) {
-    throw { type: "not_found", message: "no data in the database" };
-  }
-  if (cardExists) {
-    throw {
-      type: "conflict",
-      message: "employee already have a card with this type",
-    };
-  } */
 
   const numberCard = faker.finance.creditCardNumber("visa");
 

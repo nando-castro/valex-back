@@ -6,19 +6,16 @@ export default function errorHandler(
   res: Response,
   next: NextFunction
 ) {
-  /* res
-    .status(error.status || 500)
-    .send(error.message || "Internal server error"); */
 
-  if (error.type === "unauthorized") {
-    return res.sendStatus(401);
-  } else if (error.type === "conflict") {
-    return res.sendStatus(409);
-  } else if (error.type === "not_found") {
-    return res.sendStatus(404);
-  } else if (error.type === "bad_request") {
-    return res.sendStatus(400);
-  }
+    if (error.type === "unauthorized") {
+      return res.status(401).send(error.message);
+    } else if (error.type === "conflict") {
+      return res.status(409).send(error.message);
+    } else if (error.type === "not_found") {
+      return res.status(404).send(error.message);
+    } else if (error.type === "bad_request") {
+      return res.status(400).send(error.message);
+    }
 
   return res.sendStatus(500);
 }

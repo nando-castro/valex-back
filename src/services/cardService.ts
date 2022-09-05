@@ -74,8 +74,8 @@ export async function activationCard(
   if (card.password) {
     throw { type: "conflict", message: "card already has password" };
   }
-  const checkCVC = cryptr.decrypt(cvc);
-  if (!checkCVC) {
+  const checkCVC = cryptr.decrypt(card.securityCode);
+  if (checkCVC !== cvc) {
     throw { type: "unauthorized", message: "unauthorized" };
   }
   if (!Number(password) || password.length != 4) {

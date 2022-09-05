@@ -5,6 +5,7 @@ import * as employeeRepository from "../repositories/employeeRepository";
 import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import Cryptr from "cryptr";
+const cryptr = new Cryptr("SecretKey");
 
 //import unauthorizedError from "../utils/error";
 
@@ -14,7 +15,6 @@ export async function createCard(
   cardType: TransactionTypes
 ) {
   //const cryptr = new Cryptr(process.env.SECRET_KEY);
-  const cryptr = new Cryptr("SecretKey");
   const company = await validateApiKey(apiKey);
   const employee = await validateEmployee(employeeId);
   const cardExists = await validateCardType(cardType, employeeId);
@@ -53,8 +53,39 @@ export async function createCard(
   };
 
   await cardRepository.insert(card);
+  console.log(securityCode)
 
   return { card, securityCode };
+}
+
+export async function activationCard(
+  id: number,
+  cvc: string,
+  password: string
+) {
+  const card = await cardRepository.findById(id);
+  if (!card) {
+    throw { type: "not_found", message: "no data in the database" };
+  }
+  const dateToday = dayjs().format("MM/YY");
+  if (dayjs(dateToday).isAfter(dayjs(card.expirationDate))) {
+    throw { type: "bad_request", message: "expired card" };
+  }
+  if (card.password) {
+    throw { type: "conflict", message: "card already has password" };
+  }
+  const checkCVC = cryptr.decrypt(cvc);
+  if (!checkCVC) {
+    throw { type: "unauthorized", message: "unauthorized" };
+  }
+  if (!Number(password) || password.length != 4) {
+    throw { type: "bad_request", message: "password in wrong format" };
+  }
+  const encryptPassword = cryptr.encrypt(password);
+  await cardRepository.update(
+    id,
+    { password: encryptPassword, isBlocked: false }
+  );
 }
 
 async function validateCardType(

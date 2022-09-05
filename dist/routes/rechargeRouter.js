@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.rechageRouter = void 0;
+const express_1 = require("express");
+const rechargeController_1 = require("../controllers/rechargeController");
+const schemaValidateMiddleware_1 = require("../middlewares/schemaValidateMiddleware");
+const rechargeSchema_1 = require("../schemas/rechargeSchema");
+const rechageRouter = (0, express_1.Router)();
+exports.rechageRouter = rechageRouter;
+rechageRouter.post("/recharge/:cardId", (0, schemaValidateMiddleware_1.schemaValidateMiddleware)(rechargeSchema_1.rechargeSchema), rechargeController_1.rechargeCard);

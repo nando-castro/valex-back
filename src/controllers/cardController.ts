@@ -13,6 +13,12 @@ export async function createCard(req: Request, res: Response) {
   res.status(201).send(newCard);
 }
 
+export async function getBalanceCard(req: Request, res: Response) {
+  const { cardId } = req.params;
+  const cardBalance = await cardService.getBalanceCard(Number(cardId));
+  return res.status(200).send(cardBalance);
+}
+
 export async function activateCard(req: Request, res: Response) {
   const { id } = req.params;
   const { cvc, password } = req.body;

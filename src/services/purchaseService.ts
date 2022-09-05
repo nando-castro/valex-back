@@ -44,7 +44,7 @@ export async function purchase(
   const amountPurchase = await purchaseRepository.findByCardId(cardId);
   const amountBalance = await rechargeRepository.findByCardId(cardId);
 
-  const balanceCard = checkBalance(amountPurchase, amountBalance);
+  const balanceCard = await checkBalance(amountPurchase, amountBalance);
   if(balanceCard < amount){
     throw {
         type: "unauthorized",
@@ -55,7 +55,7 @@ export async function purchase(
   await purchaseRepository.insert({ cardId, businessId, amount });
 }
 
-function checkBalance(
+export async function checkBalance(
   amountPurchase: purchaseRepository.Payment[],
   amountBalance: rechargeRepository.Recharge[]
 ) {

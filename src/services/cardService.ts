@@ -2,11 +2,32 @@ import { TransactionTypes } from "./../repositories/cardRepository";
 import * as cardRepository from "./../repositories/cardRepository";
 import * as companyRepository from "../repositories/companyRepository";
 import * as employeeRepository from "../repositories/employeeRepository";
+import * as purchaseRepository from "../repositories/paymentRepository";
+import * as businessRepository from "../repositories/businessRepository";
+import * as rechargeRepository from "../repositories/rechargeRepository";
 import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import Cryptr from "cryptr";
+import { checkBalance } from "./purchaseService";
 const cryptr = new Cryptr("SecretKey");
 //const cryptr = new Cryptr(process.env.SECRET_KEY);
+
+export async function getBalanceCard(cardId: number) {
+  const card = await cardRepository.findById(cardId);
+  if (!card) {
+    throw { type: "not_found", message: "no data in the database" };
+  }
+  const amountPurchase = await purchaseRepository.findByCardId(cardId);
+  const amountBalance = await rechargeRepository.findByCardId(cardId);
+
+  const balanceCard = await checkBalance(amountPurchase, amountBalance);
+
+  return {
+    balance: balanceCard,
+    transactions: amountPurchase,
+    recharges: amountBalance,
+  };
+}
 
 export async function blockedCard(id: number, password: string) {
   const card = await cardRepository.findById(id);
@@ -41,7 +62,7 @@ export async function unblockedCard(id: number, password: string) {
   if (!card.isBlocked) {
     throw { type: "not_found", message: "no data in the database" };
   }
-  
+
   const decryptPassword = cryptr.decrypt(`${card.password}`);
 
   if (decryptPassword !== password) {

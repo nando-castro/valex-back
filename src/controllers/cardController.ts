@@ -4,7 +4,6 @@ import { TransactionTypes } from "../repositories/cardRepository";
 
 export async function createCard(req: Request, res: Response) {
   const apiKey = req.headers["x-api-key"] as string;
-  //const { employeeId } = req.params as any;
   const {
     employeeId,
     cardType,

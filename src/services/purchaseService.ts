@@ -45,11 +45,11 @@ export async function purchase(
   const amountBalance = await rechargeRepository.findByCardId(cardId);
 
   const balanceCard = await checkBalance(amountPurchase, amountBalance);
-  if(balanceCard < amount){
+  if (balanceCard < amount) {
     throw {
-        type: "unauthorized",
-        message: "insufficient balance",
-      };
+      type: "unauthorized",
+      message: "insufficient balance",
+    };
   }
 
   await purchaseRepository.insert({ cardId, businessId, amount });
@@ -59,11 +59,17 @@ export async function checkBalance(
   amountPurchase: purchaseRepository.Payment[],
   amountBalance: rechargeRepository.Recharge[]
 ) {
-   const balanceTotal = amountBalance.map((item) => item.amount).reduce((a,b) => a+b)
-   let outlay = 0;
-   if(amountPurchase.length > 0){
-       outlay = amountPurchase.map((item) => item.amount).reduce((a,b) => a+b)
-   }
-   const resultBalance = balanceTotal - outlay;
-   return resultBalance;
+  let balanceTotal;
+  if (amountBalance.length > 0) {
+    balanceTotal = amountBalance
+      .map((item) => item.amount)
+      .reduce((a, b) => a + b);
+  }
+  balanceTotal = 0;
+  let outlay = 0;
+  if (amountPurchase.length > 0) {
+    outlay = amountPurchase.map((item) => item.amount).reduce((a, b) => a + b);
+  }
+  const resultBalance = balanceTotal - outlay;
+  return resultBalance;
 }

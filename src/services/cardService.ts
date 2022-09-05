@@ -17,7 +17,17 @@ export async function createCard(
   const cryptr = new Cryptr("SecretKey");
   const company = await validateApiKey(apiKey);
   const employee = await validateEmployee(employeeId);
-  //const cardExists = await validateCardType(cardType, employeeId);
+  const cardExists = await validateCardType(cardType, employeeId);
+
+  /* if (!company || !employee) {
+    throw { type: "not_found", message: "no data in the database" };
+  }
+  if (cardExists) {
+    throw {
+      type: "conflict",
+      message: "employee already have a card with this type",
+    };
+  } */
 
   const numberCard = faker.finance.creditCardNumber("visa");
 
@@ -33,7 +43,7 @@ export async function createCard(
     employeeId,
     number: numberCard,
     cardholderName,
-    securityCode,
+    securityCode: encryptedCVV,
     expirationDate,
     password: undefined,
     isVirtual: false,
@@ -56,7 +66,7 @@ async function validateCardType(
     employeeId
   );
 
-  if (!card) {
+  if (card) {
     throw {
       type: "conflict",
       message: "employee already have a card with this type",

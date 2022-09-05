@@ -1,7 +1,7 @@
+import { Router } from "express";
 import { blockedSchema } from './../schemas/blockedSchema';
 import { activationSchema } from "./../schemas/activationSchema";
 import { createCardSchema } from "./../schemas/cardSchema";
-import { Router } from "express";
 import * as cardController from "../controllers/cardController";
 import { schemaValidateMiddleware } from "../middlewares/schemaValidateMiddleware";
 

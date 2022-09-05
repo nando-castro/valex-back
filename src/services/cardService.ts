@@ -8,8 +8,6 @@ import Cryptr from "cryptr";
 const cryptr = new Cryptr("SecretKey");
 //const cryptr = new Cryptr(process.env.SECRET_KEY);
 
-//import unauthorizedError from "../utils/error";
-
 export async function blockedCard(id: number, password: string) {
   const card = await cardRepository.findById(id);
   if (!card) {
@@ -22,7 +20,6 @@ export async function blockedCard(id: number, password: string) {
   if (card.isBlocked) {
     throw { type: "not_found", message: "no data in the database" };
   }
-  //Não está descriptografando a senha
   const decryptPassword = cryptr.decrypt(`${card.password}`);
 
   if (decryptPassword !== password) {
@@ -45,7 +42,6 @@ export async function unblockedCard(id: number, password: string) {
     throw { type: "not_found", message: "no data in the database" };
   }
   
-  //Não está descriptografando a senha
   const decryptPassword = cryptr.decrypt(`${card.password}`);
 
   if (decryptPassword !== password) {

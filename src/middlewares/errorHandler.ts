@@ -6,7 +6,7 @@ export default function errorHandler(
   res: Response,
   next: NextFunction
 ) {
-
+  console.log(error)
     if (error.type === "unauthorized") {
       return res.status(401).send(error.message);
     } else if (error.type === "conflict") {

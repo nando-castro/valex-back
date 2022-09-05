@@ -13,6 +13,13 @@ export async function createCard(req: Request, res: Response) {
   res.status(201).send(newCard);
 }
 
+export async function viewCards(req: Request, res: Response) {
+  const { employeeId, cardType, password }: { employeeId: number; cardType: TransactionTypes; password: string } =
+    req.body;
+  const cardInfo = await cardService.viewCards(employeeId, cardType, password);
+  return res.status(200).send(cardInfo);
+}
+
 export async function getBalanceCard(req: Request, res: Response) {
   const { cardId } = req.params;
   const cardBalance = await cardService.getBalanceCard(Number(cardId));
@@ -45,19 +52,3 @@ export async function unblockedCard(req: Request, res: Response) {
 
   return res.sendStatus(200);
 }
-
-/* 
-{
-  "card": {
-    "employeeId": 1,
-    "number": "4853798628416",
-    "cardholderName": "FULANO F F SILVA",
-    "securityCode": "238",
-    "expirationDate": "09/27",
-    "isVirtual": false,
-    "isBlocked": true,
-    "type": "education"
-  },
-  "securityCode": "238"
-}
- */

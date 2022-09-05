@@ -3,7 +3,6 @@ import * as cardRepository from "./../repositories/cardRepository";
 import * as companyRepository from "../repositories/companyRepository";
 import * as employeeRepository from "../repositories/employeeRepository";
 import * as purchaseRepository from "../repositories/paymentRepository";
-import * as businessRepository from "../repositories/businessRepository";
 import * as rechargeRepository from "../repositories/rechargeRepository";
 import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
@@ -11,6 +10,49 @@ import Cryptr from "cryptr";
 import { checkBalance } from "./purchaseService";
 const cryptr = new Cryptr("SecretKey");
 //const cryptr = new Cryptr(process.env.SECRET_KEY);
+
+export async function viewCards(
+  employeeId: number,
+  cardtype: TransactionTypes,
+  password: string
+) {
+  const employee = await employeeRepository.findById(employeeId);
+  if (!employee) {
+    throw { type: "not_found", message: "employee no data in the database" };
+  }
+  const card = await cardRepository.findByTypeAndEmployeeId(
+    cardtype,
+    employeeId
+  );
+  if (!card) {
+    throw { type: "not_found", message: "no data in the database" };
+  }
+  const dateToday = dayjs().format("MM/YY");
+  if (dayjs(dateToday).isAfter(dayjs(card.expirationDate))) {
+    throw { type: "bad_request", message: "expired card" };
+  }
+  if (card.isBlocked) {
+    throw { type: "not_found", message: "no data in the database" };
+  }
+  const decryptPassword = cryptr.decrypt(`${card.password}`);
+  if (decryptPassword !== password) {
+    throw { type: "unauthorized", message: "incorrect card password" };
+  }
+
+  const decryptCode = cryptr.decrypt(card.securityCode);
+  const formatNumberCard = card.number.replace(/-/g," ");
+
+  const cardInfos = {
+    number: formatNumberCard,
+    cardholderName: card.cardholderName,
+    expirationDate: card.expirationDate,
+    securityCode: decryptCode,
+  };
+
+  return {
+    cards: cardInfos,
+  };
+}
 
 export async function getBalanceCard(cardId: number) {
   const card = await cardRepository.findById(cardId);
@@ -111,7 +153,7 @@ export async function createCard(
   const employee = await validateEmployee(employeeId);
   const cardExists = await validateCardType(cardType, employeeId);
 
-  const numberCard = faker.finance.creditCardNumber("visa");
+  const numberCard = faker.finance.creditCardNumber("mastercard");
 
   const cardholderName = formatNameCard(employee.fullName);
 

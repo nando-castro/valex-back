@@ -4,7 +4,7 @@ import { activationSchema } from "./../schemas/activationSchema";
 import { createCardSchema } from "./../schemas/cardSchema";
 import * as cardController from "../controllers/cardController";
 import { schemaValidateMiddleware } from "../middlewares/schemaValidateMiddleware";
-import { balanceCardSchema } from "../schemas/balanceCardSchema";
+import { viewCardSchema } from "../schemas/viewCardSchema";
 
 const cardRouter = Router();
 
@@ -19,9 +19,11 @@ cardRouter.post(
   cardController.activateCard
 );
 cardRouter.get(
-  "/balance/:cardId",
-  cardController.getBalanceCard
+  "/card",
+  schemaValidateMiddleware(viewCardSchema),
+  cardController.viewCards
 );
+cardRouter.get("/balance/:cardId", cardController.getBalanceCard);
 cardRouter.put(
   "/card/:id/blocked",
   schemaValidateMiddleware(blockedSchema),

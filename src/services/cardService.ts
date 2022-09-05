@@ -33,6 +33,29 @@ export async function blockedCard(id: number, password: string) {
   await cardRepository.update(id, { isBlocked: true });
 }
 
+export async function unblockedCard(id: number, password: string) {
+  const card = await cardRepository.findById(id);
+  if (!card) {
+    throw { type: "not_found", message: "no data in the database" };
+  }
+  const dateToday = dayjs().format("MM/YY");
+  if (dayjs(dateToday).isAfter(dayjs(card.expirationDate))) {
+    throw { type: "bad_request", message: "expired card" };
+  }
+  if (!card.isBlocked) {
+    throw { type: "not_found", message: "no data in the database" };
+  }
+  //Não está descriptografando a senha
+  /* const decryptPassword = cryptr.decrypt(card.password);
+  console.log(decryptPassword);
+
+  if (decryptPassword !== password) {
+    throw { type: "unauthorized", message: "incorrect card password" };
+  } */
+
+  await cardRepository.update(id, { isBlocked: false });
+}
+
 export async function activationCard(
   id: number,
   cvc: string,

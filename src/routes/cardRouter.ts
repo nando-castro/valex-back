@@ -18,5 +18,6 @@ cardRouter.post(
   cardController.activateCard
 );
 cardRouter.put("/card/:id/blocked", schemaValidateMiddleware(blockedSchema), cardController.blockedCard)
+cardRouter.put("/card/:id/unblocked", schemaValidateMiddleware(blockedSchema), cardController.unblockedCard)
 
 export { cardRouter };

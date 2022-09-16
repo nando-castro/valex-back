@@ -59,13 +59,12 @@ export async function checkBalance(
   amountPurchase: purchaseRepository.Payment[],
   amountBalance: rechargeRepository.Recharge[]
 ) {
-  let balanceTotal;
+  let balanceTotal = 0;
   if (amountBalance.length > 0) {
     balanceTotal = amountBalance
       .map((item) => item.amount)
       .reduce((a, b) => a + b);
   }
-  balanceTotal = 0;
   let outlay = 0;
   if (amountPurchase.length > 0) {
     outlay = amountPurchase.map((item) => item.amount).reduce((a, b) => a + b);
